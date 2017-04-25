@@ -29,4 +29,9 @@
       <Filter>Assets</Filter>
     </Manifest>
   </ItemGroup>
+  <ItemGroup>
+    <ImageContentTask Include="Assets\cat.png">
+      <Filter>Assets</Filter>
+    </ImageContentTask>
+  </ItemGroup>
 </Project>

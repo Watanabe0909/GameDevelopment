@@ -4,6 +4,10 @@
 
 #include "pch.h"
 #include "Game.h"
+#include <sstream>
+#include <WICTextureLoader.h>
+#include <DDSTextureLoader.h>
+#include <CommonStates.h>
 
 extern void ExitGame();
 
@@ -36,6 +40,32 @@ void Game::Initialize(HWND window, int width, int height)
     m_timer.SetFixedTimeStep(true);
     m_timer.SetTargetElapsedSeconds(1.0 / 60);
     */
+
+	m_spriteBatch = std::make_unique<SpriteBatch>(m_d3dContext.Get());
+	m_spriteFont = std::make_unique<SpriteFont>(m_d3dDevice.Get(), L"Resources/myfile.spritefont");
+
+	//リソース情報
+	ComPtr<ID3D11Resource> resource;
+	DX::ThrowIfFailed(
+		CreateWICTextureFromFile(m_d3dDevice.Get(), L"Resources/cat.png",
+			resource.GetAddressOf(),
+			m_texture.ReleaseAndGetAddressOf()));
+	//DX::ThrowIfFailed(
+	//	CreateDDSTextureFromFile(m_d3dDevice.Get(), L"Resources/cat.dds",
+	//		resource.GetAddressOf(),
+	//		m_texture.ReleaseAndGetAddressOf()));
+	//猫のテクスチャ
+	ComPtr<ID3D11Texture2D> cat;
+	DX::ThrowIfFailed(resource.As(&cat));
+	//テクスチャの情報
+	CD3D11_TEXTURE2D_DESC catDesc;
+	cat->GetDesc(&catDesc);
+	//テクスチャの原点を画像の中心にする
+	m_origin.x = float(catDesc.Width / 2);
+	m_origin.y = float(catDesc.Height / 2);
+	//表示座標を画面の中央に指定
+	m_screenPos.x = m_outputWidth / 2.f;
+	m_screenPos.y = m_outputHeight / 2.f;
 }
 
 // Executes the basic game loop.
@@ -56,6 +86,17 @@ void Game::Update(DX::StepTimer const& timer)
 
     // TODO: Add your game logic here.
     elapsedTime;
+
+	//カウンターを進める
+	m_cnt++;
+
+	//文字列に代入
+	//m_str = L"I am the bone of my sword";
+	std::wstringstream ss;
+	//ストリングストリームに出力
+	ss << L"I am the bone of my sword ";
+	//ストリングストリームから文字列を取得
+	m_str = ss.str();
 }
 
 // Draws the scene.
@@ -70,7 +111,18 @@ void Game::Render()
     Clear();
 
     // TODO: Add your rendering code here.
+	CommonStates states(m_d3dDevice.Get());
+	m_spriteBatch->Begin(SpriteSortMode_Deferred, states.NonPremultiplied());
 
+	//テクスチャの切り取り矩形
+	RECT rect;
+
+	m_spriteFont->DrawString(m_spriteBatch.get(),m_str.c_str(), XMFLOAT2(100, 100));
+
+	m_spriteBatch->Draw(m_texture.Get(), m_screenPos, nullptr, Colors::White,
+		0.f, m_origin);
+	m_spriteBatch->End();
+	
     Present();
 }
 
