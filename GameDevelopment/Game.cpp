@@ -66,6 +66,9 @@ void Game::Initialize(HWND window, int width, int height)
 	//表示座標を画面の中央に指定
 	m_screenPos.x = m_outputWidth / 2.f;
 	m_screenPos.y = m_outputHeight / 2.f;
+
+	//キーボードのオブジェクトの生成
+	m_keyboard = std::make_unique<Keyboard>();
 }
 
 // Executes the basic game loop.
@@ -97,6 +100,22 @@ void Game::Update(DX::StepTimer const& timer)
 	ss << L"I am the bone of my sword ";
 	//ストリングストリームから文字列を取得
 	m_str = ss.str();
+
+	//キーボードの状態を取得
+	Keyboard::State kb = m_keyboard->GetState();
+	//キーボードトラッカーの更新
+	m_keyboardTracker.Update(kb);
+
+	//if (kb.Back)
+	//{
+	//	// Backspace key is down
+	//	m_str = L"BackSpace!";
+	//}
+	if (m_keyboardTracker.pressed.Space)
+	{
+		// Space was just pressed down
+		m_str = L"Space!";
+	}
 }
 
 // Draws the scene.
