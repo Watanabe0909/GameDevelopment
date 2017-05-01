@@ -95,26 +95,34 @@ void Game::Update(DX::StepTimer const& timer)
 
 	//文字列に代入
 	//m_str = L"I am the bone of my sword";
-	std::wstringstream ss;
+	//std::wstringstream ss;
 	//ストリングストリームに出力
-	ss << L"I am the bone of my sword ";
+	//ss << L"I am the bone of my sword ";
 	//ストリングストリームから文字列を取得
-	m_str = ss.str();
+	//m_str = ss.str();
 
 	//キーボードの状態を取得
 	Keyboard::State kb = m_keyboard->GetState();
 	//キーボードトラッカーの更新
 	m_keyboardTracker.Update(kb);
 
-	//if (kb.Back)
-	//{
-	//	// Backspace key is down
-	//	m_str = L"BackSpace!";
-	//}
-	if (m_keyboardTracker.pressed.Space)
+	if (kb.Back)
+	{
+		// Backspace key is down
+		m_str = L"BackSpace!";
+	}
+	else if (m_keyboardTracker.pressed.Space)
 	{
 		// Space was just pressed down
 		m_str = L"Space!";
+	}
+	else if (m_keyboardTracker.released.Enter)
+	{
+		m_str = L"Enter!";
+	}
+	else
+	{
+		m_str = L"";
 	}
 }
 
